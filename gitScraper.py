@@ -15,11 +15,11 @@ class Scraper:
 
     def git_scrape(self) -> list:
         response = requests.get(self.repos)
-        print(response)
         if response:
             soup = BeautifulSoup(response.content, "html.parser")
             pattern = r'"\/psypherion\/[\w-]+\" itemprop=\"name codeRepository'
-            links = [link.split(" ")[0] for link in re.findall(pattern, str(soup))]
+            links = [re.sub(r'^"|"$', '',link.split(" ")[0])
+                    for link in re.findall(pattern, str(soup))]
             return links
 
 if __name__ == "__main__":
