@@ -7,17 +7,22 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import re
 from typing import Any, AnyStr
-profile: str = input("Enter profile name: ")
+class Scraper:
+    def __init__(self, profile) -> None:
+        self.profile = profile
+        self.base_url =  "http://github.com/"+self.profile
+        self.repos = self.base_url+"?tab=repositories"
 
-base_url: str = "http://github.com/"+profile+"?tab=repositories"
+    def git_scrape(self) -> list:
+        response = requests.get(self.repos)
+        print(response)
+        if response:
+            soup = BeautifulSoup(response.content, "html.parser")
+            pattern = r'"\/psypherion\/[\w-]+\" itemprop=\"name codeRepository'
+            links = [link.split(" ")[0] for link in re.findall(pattern, str(soup))]
+            return links
 
-response: Any = requests.get(base_url)
-
-soup = BeautifulSoup(response.content, "html.parser")
-
-pattern: str = r'"\/psypherion\/[\w-]+\" itemprop=\"name codeRepository'
-
-links: list = [link.split(" ")[0] for link in re.findall(pattern, str(soup))]
-
-print(links)
-
+if __name__ == "__main__":
+    profile: str = input("Enter profile name: ")
+    scraper = Scraper(profile)
+    print(scraper.git_scrape())
